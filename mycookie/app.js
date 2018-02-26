@@ -19,28 +19,29 @@ app.set('view engine', 'ejs');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
   secret: 'keyboard cat', // 亂數產生一個編號，若要安全可使設定讓 session 去編碼，駭客較不易入侵
   resave: true, // 重新造訪 session 會生效，或是否會寫入到 node.js 上，建議為 true
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: {maxAge: 10 * 1000} // 10 秒後失效
 }));
 
 app.use('/', index);
 app.use('/users', users);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

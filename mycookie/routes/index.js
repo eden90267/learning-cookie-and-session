@@ -3,15 +3,12 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-  console.log(req.session);
-  req.session.username = 'tom';
-  req.session.email = 'email';
-  res.cookie('name', 'mary', {
-    maxAge: 10000, // 10 秒
-    httpOnly: true
-  });
-
-  res.render('index', {title: 'Express'});
+  res.render('index', {username: req.session.username, email: req.session.email});
+});
+router.post('/', function (req, res) {
+  req.session.username = req.body.username;
+  req.session.email = req.body.email;
+  res.redirect('/');
 });
 
 module.exports = router;

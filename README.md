@@ -74,7 +74,7 @@ module.exports = router;
 ### 一個例子
 
 - Client 進入瀏覽器
-- Server 提供 session ID 給 client，並在 session 記錄詳細資訊
+- Server 提供 session ID 給 client (號碼牌)，並在 session 記錄詳細資訊
 - Client 離開瀏覽器
 - Client 進入瀏覽器，提供 session ID 給 Server
 - Server 透過 session ID 得到該 session 詳細資訊
@@ -116,3 +116,58 @@ router.get('/', function (req, res, next) {
   res.render('index', {title: 'Express'});
 });
 ```
+
+## session 結合 form post 設計
+
+```javascript
+// routes/index.js
+
+/* GET home page. */
+router.get('/', function (req, res, next) {
+  res.render('index', {username: req.session.username, email: req.session.email});
+});
+router.post('/', function (req, res) {
+  req.session.username = req.body.username;
+  req.session.email = req.body.email;
+  res.redirect('/');
+});
+```
+
+```html
+<!--index.ejs-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Index</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= username %> <%= email %></h1>
+    <form method="post" action="/">
+        <input type="text" name="username">
+        <input type="email" name="email">
+        <input type="submit" value="送出">
+    </form>
+  </body>
+</html>
+```
+
+```javascript
+// app.js
+
+app.use(session({
+  secret: 'keyboard cat', // 亂數產生一個編號，若要安全可使設定讓 session 去編碼，駭客較不易入侵
+  resave: true, // 重新造訪 session 會生效，或是否會寫入到 node.js 上，建議為 true
+  saveUninitialized: true,
+  cookie: {maxAge: 10 * 1000} // 10 秒後失效
+}));
+```
+
+## Cookie、Session 的總結
+
+不是重要資訊要保留：Cookie；若是機密資訊要保留：Session
+
+## FB Login 機制講解
+
+一樣 Cookie 存取號碼牌 原理
